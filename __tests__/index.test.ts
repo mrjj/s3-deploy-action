@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import { execSync } from "child_process";
-import { run } from "../src/index"; // Adjust path as needed
+import { run } from "../src";
 
 jest.mock("child_process", () => ({
   execSync: jest.fn(),
@@ -28,6 +28,8 @@ describe("S3 Deploy GitHub Action", () => {
           return "us-east-1";
         case "CLOUDFRONT_DISTRIBUTION_ID":
           return "test-distribution-id";
+        case "AWS_S3_ENDPOINT":
+          return "test-endpoint";
         default:
           return "";
       }
@@ -59,7 +61,7 @@ describe("S3 Deploy GitHub Action", () => {
     await run();
 
     expect(execSync).toHaveBeenCalledWith(
-      `aws s3 sync test-source-dir s3://test-bucket --acl public-read --no-progress`,
+      `aws s3 sync test-source-dir s3://test-bucket --acl public-read --no-progress --endpoint-url test-endpoint`,
       { stdio: "inherit" }
     );
   });
@@ -88,6 +90,8 @@ describe("S3 Deploy GitHub Action", () => {
           return "us-east-1";
         case "CLOUDFRONT_DISTRIBUTION_ID":
           return "";
+        case "AWS_S3_ENDPOINT":
+          return "test-endpoint";
         default:
           return "";
       }
