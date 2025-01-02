@@ -19,7 +19,7 @@ function syncFilesToS3(bucketName: string, sourceDir: string, endpoint?: string)
     }
     const endpointParam = endpoint ? `--endpoint-url ${endpoint}` : "";
     execSync(
-      `aws s3 sync ${sourceDir} s3://${bucketName} --acl public-read --no-progress ${endpointParam}`,
+      `aws s3 sync --exclude '.*' ${sourceDir} s3://${bucketName} --acl public-read --no-progress ${endpointParam}`,
       { stdio: "inherit" }
     );
   } catch (error) {
