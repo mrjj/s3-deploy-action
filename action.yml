@@ -25,6 +25,11 @@ inputs:
   CLOUDFRONT_DISTRIBUTION_ID:
     description: "CloudFront distribution ID for cache invalidation"
     required: false
+
+  AWS_S3_ENDPOINT:
+    description: "Optional endpoint URL for the S3 bucket"
+    required: false
+
 runs:
   using: "node20"
   main: "dist/index.js"

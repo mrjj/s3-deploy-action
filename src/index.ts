@@ -4,18 +4,22 @@ import { execSync } from "child_process";
 function setAwsEnvVariables(
   accessKeyId: string,
   secretAccessKey: string,
-  region: string
+  region: string,
 ) {
   process.env.AWS_ACCESS_KEY_ID = accessKeyId;
   process.env.AWS_SECRET_ACCESS_KEY = secretAccessKey;
   process.env.AWS_DEFAULT_REGION = region;
 }
 
-function syncFilesToS3(bucketName: string, sourceDir: string) {
+function syncFilesToS3(bucketName: string, sourceDir: string, endpoint?: string) {
   try {
     console.log(`Syncing files from ${sourceDir} to S3 bucket: ${bucketName}`);
+    if (endpoint) {
+      console.log(`Using endpoint: ${endpoint}`);
+    }
+    const endpointParam = endpoint ? `--endpoint-url ${endpoint}` : "";
     execSync(
-      `aws s3 sync ${sourceDir} s3://${bucketName} --acl public-read --no-progress`,
+      `aws s3 sync ${sourceDir} s3://${bucketName} --acl public-read --no-progress ${endpointParam}`,
       { stdio: "inherit" }
     );
   } catch (error) {
@@ -50,10 +54,11 @@ async function run() {
     const cloudfrontDistributionId = core.getInput(
       "CLOUDFRONT_DISTRIBUTION_ID"
     );
+    const endpoint = core.getInput("AWS_S3_ENDPOINT") || "";
 
     setAwsEnvVariables(accessKeyId, secretAccessKey, region);
 
-    syncFilesToS3(bucketName, sourceDir);
+    syncFilesToS3(bucketName, sourceDir, endpoint);
 
     if (cloudfrontDistributionId) {
       invalidateCloudFrontCache(cloudfrontDistributionId);
